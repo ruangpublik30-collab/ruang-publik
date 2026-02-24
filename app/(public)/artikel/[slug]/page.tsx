@@ -34,6 +34,7 @@ function stripHtml(html: string) {
 
 async function getBaseUrl() {
     const headerList = await headers()
+
     const host =
         headerList.get("x-forwarded-host") ||
         headerList.get("host") ||
@@ -108,20 +109,22 @@ export async function generateMetadata(
             url,
             title: data.title,
             description,
-            images: [
-                {
-                    url: imageUrl,
-                    width: 1200,
-                    height: 630,
-                },
-            ],
+            images: imageUrl
+                ? [
+                    {
+                        url: imageUrl,
+                        width: 1200,
+                        height: 630,
+                    },
+                ]
+                : [],
             publishedTime: data.published_at || undefined,
         },
         twitter: {
             card: "summary_large_image",
             title: data.title,
             description,
-            images: [imageUrl],
+            images: imageUrl ? [imageUrl] : [],
         },
     }
 }
@@ -142,7 +145,9 @@ export default async function ArticlePage(
         .eq("status", "published")
         .single()
 
-    if (error || !article) notFound()
+    if (error || !article) {
+        notFound()
+    }
 
     /* ================= IP HASH ================= */
 
@@ -213,7 +218,9 @@ export default async function ArticlePage(
 
                 <div
                     className="prose-article"
-                    dangerouslySetInnerHTML={{ __html: article.content }}
+                    dangerouslySetInnerHTML={{
+                        __html: article.content,
+                    }}
                 />
             </article>
 
