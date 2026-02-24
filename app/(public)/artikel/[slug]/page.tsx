@@ -10,37 +10,63 @@ import { headers } from "next/headers"
 import crypto from "crypto"
 import type { Metadata } from "next"
 
+/* ================= TYPES ================= */
 
+type Params = Promise<{ slug: string }>
 
 type Props = {
-    params: { slug: string }
+    params: Params
 }
+
+/* ================= HELPER ================= */
+
+function stripHtml(html: string) {
+    return html.replace(/<[^>]+>/g, "")
+}
+
+async function getBaseUrl() {
+    const headerList = await headers()
+    const host = headerList.get("x-forwarded-host") || headerList.get("host")
+
+    const protocol =
+        process.env.NODE_ENV === "production" ? "https" : "http"
+
+    return `${protocol}://${host}`
+}
+
+/* ================= METADATA ================= */
 
 export async function generateMetadata(
     { params }: Props
 ): Promise<Metadata> {
 
-    const { slug } = await params   // ✅ WAJIB await
+    const { slug } = await params
 
     const supabase = await createClient()
 
     const { data } = await supabase
         .from("articles")
         .select("title, content, thumbnail_url, slug, published_at")
-        .eq("slug", slug)           // ✅ pakai slug
+        .eq("slug", slug)
         .eq("status", "published")
         .single()
 
     if (!data) {
         return {
-            title: "Artikel tidak ditemukan"
+            title: "Artikel tidak ditemukan",
         }
     }
 
-    const description =
-        data.content?.replace(/<[^>]+>/g, "").slice(0, 160)
+    const baseUrl = await getBaseUrl()
 
-    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/artikel/${data.slug}`
+    const url = `${baseUrl}/artikel/${data.slug}`
+
+    const description =
+        stripHtml(data.content || "").slice(0, 160)
+
+    const imageUrl = data.thumbnail_url?.startsWith("http")
+        ? data.thumbnail_url
+        : `${baseUrl}${data.thumbnail_url}`
 
     return {
         title: data.title,
@@ -55,39 +81,32 @@ export async function generateMetadata(
             description,
             images: [
                 {
-                    url: data.thumbnail_url,
+                    url: imageUrl,
                     width: 1200,
                     height: 630,
                 },
             ],
-            publishedTime: data.published_at,
+            publishedTime: data.published_at || undefined,
         },
         twitter: {
             card: "summary_large_image",
             title: data.title,
             description,
-            images: [data.thumbnail_url],
+            images: [imageUrl],
         },
     }
 }
 
-type Comment = {
-    id: string
-    parent_id: string | null
-    name: string
-    content: string
-    created_at: string
-    replies?: Comment[]
-}
+/* ================= PAGE ================= */
 
 export default async function ArticlePage(
-    { params }: { params: { slug: string } }
+    { params }: Props
 ) {
-    const { slug } = await Promise.resolve(params)
+
+    const { slug } = await params
 
     const supabase = await createClient()
 
-    /* ================= ARTIKEL ================= */
     const { data: article, error } = await supabase
         .from("articles")
         .select("id, slug, title, content, thumbnail_url, published_at, views")
@@ -97,11 +116,12 @@ export default async function ArticlePage(
 
     if (error || !article) notFound()
 
-    /* ================= IP HASH (SERVER SIDE) ================= */
-    const headersList = await headers() // ✅ WAJIB await di Next terbaru
+    /* ================= IP HASH ================= */
 
-    const forwarded = headersList.get("x-forwarded-for")
-    const realIp = headersList.get("x-real-ip")
+    const headerList = await headers()
+
+    const forwarded = headerList.get("x-forwarded-for")
+    const realIp = headerList.get("x-real-ip")
 
     const ip = forwarded
         ? forwarded.split(",")[0].trim()
@@ -112,12 +132,22 @@ export default async function ArticlePage(
         .update(ip)
         .digest("hex")
 
-    /* ================= KOMENTAR ================= */
+    /* ================= COMMENTS ================= */
+
     const { data: allComments } = await supabase
         .from("comments")
         .select("id, parent_id, name, content, created_at")
         .eq("article_id", article.id)
         .order("created_at", { ascending: true })
+
+    type Comment = {
+        id: string
+        parent_id: string | null
+        name: string
+        content: string
+        created_at: string
+        replies?: Comment[]
+    }
 
     function buildTree(comments: Comment[]): Comment[] {
         const map = new Map<string, Comment>()
@@ -140,15 +170,15 @@ export default async function ArticlePage(
 
     const commentTree = buildTree(allComments || [])
 
+    const baseUrl = await getBaseUrl()
+    const shareUrl = `${baseUrl}/artikel/${article.slug}`
+
+    /* ================= RENDER ================= */
+
     return (
         <>
-            {/* ================= VIEW TRACKING ================= */}
-            <TrackView
-                articleId={article.id}
-                ipHash={ipHash}
-            />
+            <TrackView articleId={article.id} ipHash={ipHash} />
 
-            {/* ================= ARTIKEL ================= */}
             <article className="max-w-3xl mx-auto">
                 <h1 className="text-4xl font-bold mb-2">
                     {article.title}
@@ -157,7 +187,8 @@ export default async function ArticlePage(
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
                     {article.published_at && (
                         <span>
-                            {new Date(article.published_at).toLocaleDateString("id-ID")}
+                            {new Date(article.published_at)
+                                .toLocaleDateString("id-ID")}
                         </span>
                     )}
 
@@ -186,52 +217,17 @@ export default async function ArticlePage(
                 />
             </article>
 
-            {/* ================= SHARE ================= */}
             <div className="max-w-3xl mx-auto mt-6 flex justify-end">
                 <ShareDropdown
                     title={article.title}
-                    url={`${process.env.NEXT_PUBLIC_SITE_URL}/artikel/${article.slug}`}
+                    url={shareUrl}
                 />
             </div>
 
-            {/* ================= KOMENTAR ================= */}
             <div className="max-w-3xl mx-auto mt-12 border-t pt-8">
                 <h2 className="text-2xl font-semibold mb-6">
                     Komentar ({allComments?.length || 0})
                 </h2>
-
-                <div className="bg-muted p-6 rounded-lg mb-8">
-                    <form action={submitComment} className="space-y-4">
-                        <input type="hidden" name="article_id" value={article.id} />
-
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <input
-                                name="name"
-                                required
-                                placeholder="Nama"
-                                className="border px-3 py-2 rounded-md w-full"
-                            />
-                            <input
-                                name="email"
-                                type="email"
-                                required
-                                placeholder="Email"
-                                className="border px-3 py-2 rounded-md w-full"
-                            />
-                        </div>
-
-                        <textarea
-                            name="content"
-                            required
-                            placeholder="Tulis komentar..."
-                            className="border px-3 py-2 rounded-md w-full min-h-[120px]"
-                        />
-
-                        <button className="bg-black text-white px-5 py-2 rounded-md">
-                            Kirim Komentar
-                        </button>
-                    </form>
-                </div>
 
                 <div className="space-y-6">
                     {commentTree.length > 0 ? (
