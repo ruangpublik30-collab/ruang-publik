@@ -1,7 +1,8 @@
+export const dynamic = "force-dynamic"
+
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { submitComment } from "@/app/actions/comment"
 import CommentItem from "@/components/CommentItem"
 import ShareDropdown from "@/components/ShareDropdown"
 import TrackView from "@/components/TrackView"
@@ -12,13 +13,20 @@ import type { Metadata } from "next"
 
 /* ================= TYPES ================= */
 
-type Params = Promise<{ slug: string }>
-
 type Props = {
-    params: Params
+    params: Promise<{ slug: string }>
 }
 
-/* ================= HELPER ================= */
+type Comment = {
+    id: string
+    parent_id: string | null
+    name: string
+    content: string
+    created_at: string
+    replies?: Comment[]
+}
+
+/* ================= HELPERS ================= */
 
 function stripHtml(html: string) {
     return html.replace(/<[^>]+>/g, "")
@@ -26,12 +34,34 @@ function stripHtml(html: string) {
 
 async function getBaseUrl() {
     const headerList = await headers()
-    const host = headerList.get("x-forwarded-host") || headerList.get("host")
+    const host =
+        headerList.get("x-forwarded-host") ||
+        headerList.get("host") ||
+        "localhost:3000"
 
     const protocol =
         process.env.NODE_ENV === "production" ? "https" : "http"
 
     return `${protocol}://${host}`
+}
+
+function buildCommentTree(comments: Comment[]): Comment[] {
+    const map = new Map<string, Comment>()
+    const roots: Comment[] = []
+
+    comments.forEach((c) => {
+        map.set(c.id, { ...c, replies: [] })
+    })
+
+    comments.forEach((c) => {
+        if (c.parent_id) {
+            map.get(c.parent_id)?.replies?.push(map.get(c.id)!)
+        } else {
+            roots.push(map.get(c.id)!)
+        }
+    })
+
+    return roots
 }
 
 /* ================= METADATA ================= */
@@ -41,7 +71,6 @@ export async function generateMetadata(
 ): Promise<Metadata> {
 
     const { slug } = await params
-
     const supabase = await createClient()
 
     const { data } = await supabase
@@ -54,11 +83,11 @@ export async function generateMetadata(
     if (!data) {
         return {
             title: "Artikel tidak ditemukan",
+            description: "Artikel tidak tersedia.",
         }
     }
 
     const baseUrl = await getBaseUrl()
-
     const url = `${baseUrl}/artikel/${data.slug}`
 
     const description =
@@ -104,7 +133,6 @@ export default async function ArticlePage(
 ) {
 
     const { slug } = await params
-
     const supabase = await createClient()
 
     const { data: article, error } = await supabase
@@ -140,35 +168,7 @@ export default async function ArticlePage(
         .eq("article_id", article.id)
         .order("created_at", { ascending: true })
 
-    type Comment = {
-        id: string
-        parent_id: string | null
-        name: string
-        content: string
-        created_at: string
-        replies?: Comment[]
-    }
-
-    function buildTree(comments: Comment[]): Comment[] {
-        const map = new Map<string, Comment>()
-        const roots: Comment[] = []
-
-        comments.forEach((c) => {
-            map.set(c.id, { ...c, replies: [] })
-        })
-
-        comments.forEach((c) => {
-            if (c.parent_id) {
-                map.get(c.parent_id)?.replies?.push(map.get(c.id)!)
-            } else {
-                roots.push(map.get(c.id)!)
-            }
-        })
-
-        return roots
-    }
-
-    const commentTree = buildTree(allComments || [])
+    const commentTree = buildCommentTree(allComments || [])
 
     const baseUrl = await getBaseUrl()
     const shareUrl = `${baseUrl}/artikel/${article.slug}`
