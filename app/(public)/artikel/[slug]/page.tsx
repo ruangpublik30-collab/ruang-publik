@@ -71,15 +71,13 @@ function buildCommentTree(comments: Comment[]): Comment[] {
 }
 
 /* =========================
-   METADATA (SEO)
+   METADATA (SEO) — FIXED
 ========================= */
-
 export async function generateMetadata(
-    { params }: { params: Params }
+    { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
 
-    const { slug } = await params
-
+    const { slug } = await params   // 🔥 WAJIB pakai await
     const supabase = await createClient()
 
     const { data } = await supabase
@@ -97,7 +95,10 @@ export async function generateMetadata(
         }
     }
 
-    const baseUrl = await getBaseUrl()
+    // 🔥 GUNAKAN DOMAIN PRODUKSI
+    const baseUrl =
+        process.env.NEXT_PUBLIC_SITE_URL || "https://ruangpublik.fun"
+
     const url = `${baseUrl}/artikel/${data.slug}`
 
     const description = stripHtml(data.content || "")
@@ -110,12 +111,17 @@ export async function generateMetadata(
             ? data.thumbnail_url
             : data.thumbnail_url
                 ? `${baseUrl}${data.thumbnail_url}`
-                : undefined
+                : `${baseUrl}/default-og-image.jpg`
 
     return {
         title: `${data.title} | Ruang Publik`,
         description,
-        alternates: { canonical: url },
+
+        metadataBase: new URL(baseUrl), // 🔥 penting agar semua URL absolut
+
+        alternates: {
+            canonical: url,
+        },
 
         openGraph: {
             type: "article",
@@ -124,28 +130,30 @@ export async function generateMetadata(
             description,
             siteName: "Ruang Publik",
             locale: "id_ID",
-            publishedTime: data.published_at || undefined,
-            images: imageUrl
-                ? [{
+            publishedTime: data.published_at ?? undefined,
+            images: [
+                {
                     url: imageUrl,
                     width: 1200,
                     height: 630,
                     alt: data.title,
-                }]
-                : [],
+                },
+            ],
         },
 
         twitter: {
             card: "summary_large_image",
             title: data.title,
             description,
-            images: imageUrl ? [imageUrl] : [],
+            images: [imageUrl],
         },
 
-        robots: { index: true, follow: true },
+        robots: {
+            index: true,
+            follow: true,
+        },
     }
 }
-
 /* =========================
    PAGE
 ========================= */
@@ -218,14 +226,22 @@ export default async function ArticlePage(
                         "@type": "Article",
                         headline: article.title,
                         description,
-                        image: article.thumbnail_url,
+                        image: article.thumbnail_url?.startsWith("http")
+                            ? article.thumbnail_url
+                            : `${baseUrl}${article.thumbnail_url}`,
                         datePublished: article.published_at,
                         dateModified: article.published_at,
-                        mainEntityOfPage: shareUrl,
+
+                        mainEntityOfPage: {
+                            "@type": "WebPage",
+                            "@id": `${baseUrl}/artikel/${article.slug}`,
+                        },
+
                         author: {
                             "@type": "Organization",
                             name: "Ruang Publik",
                         },
+
                         publisher: {
                             "@type": "Organization",
                             name: "Ruang Publik",
@@ -237,7 +253,6 @@ export default async function ArticlePage(
                     }),
                 }}
             />
-
             <article className="max-w-3xl mx-auto">
                 <h1 className="text-4xl font-bold mb-2">
                     {article.title}
