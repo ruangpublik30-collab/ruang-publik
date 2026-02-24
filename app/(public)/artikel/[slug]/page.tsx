@@ -16,7 +16,9 @@ import { Eye } from "lucide-react"
    TYPES
 ========================= */
 
-type Params = Promise<{ slug: string }>
+type PageProps = {
+    params: { slug: string }
+}
 
 type Comment = {
     id: string
@@ -71,28 +73,25 @@ function buildCommentTree(comments: Comment[]): Comment[] {
 }
 
 /* =========================
-   METADATA (SEO)
+   SEO METADATA
 ========================= */
 
 export async function generateMetadata(
-    { params }: { params: Params }
+    { params }: PageProps
 ): Promise<Metadata> {
-
-    const { slug } = await params
 
     const supabase = await createClient()
 
     const { data } = await supabase
         .from("articles")
         .select("title, content, thumbnail_url, slug, published_at")
-        .eq("slug", slug)
+        .eq("slug", params.slug)
         .eq("status", "published")
         .single()
 
     if (!data) {
         return {
             title: "Artikel tidak ditemukan | Ruang Publik",
-            description: "Artikel tidak tersedia.",
             robots: { index: false, follow: false },
         }
     }
@@ -115,7 +114,9 @@ export async function generateMetadata(
     return {
         title: `${data.title} | Ruang Publik`,
         description,
-        alternates: { canonical: url },
+        alternates: {
+            canonical: url,
+        },
 
         openGraph: {
             type: "article",
@@ -126,12 +127,14 @@ export async function generateMetadata(
             locale: "id_ID",
             publishedTime: data.published_at || undefined,
             images: imageUrl
-                ? [{
-                    url: imageUrl,
-                    width: 1200,
-                    height: 630,
-                    alt: data.title,
-                }]
+                ? [
+                    {
+                        url: imageUrl,
+                        width: 1200,
+                        height: 630,
+                        alt: data.title,
+                    },
+                ]
                 : [],
         },
 
@@ -142,30 +145,31 @@ export async function generateMetadata(
             images: imageUrl ? [imageUrl] : [],
         },
 
-        robots: { index: true, follow: true },
+        robots: {
+            index: true,
+            follow: true,
+        },
     }
 }
 
 /* =========================
-   PAGE
+   PAGE COMPONENT
 ========================= */
 
 export default async function ArticlePage(
-    { params }: { params: Params }
+    { params }: PageProps
 ) {
-
-    const { slug } = await params
 
     const supabase = await createClient()
 
-    const { data: article, error } = await supabase
+    const { data: article } = await supabase
         .from("articles")
         .select("id, slug, title, content, thumbnail_url, published_at, views")
-        .eq("slug", slug)
+        .eq("slug", params.slug)
         .eq("status", "published")
         .single()
 
-    if (error || !article) {
+    if (!article) {
         notFound()
     }
 
@@ -187,13 +191,13 @@ export default async function ArticlePage(
 
     /* ================= COMMENTS ================= */
 
-    const { data: allComments } = await supabase
+    const { data: comments } = await supabase
         .from("comments")
         .select("id, parent_id, name, content, created_at")
         .eq("article_id", article.id)
         .order("created_at", { ascending: true })
 
-    const commentTree = buildCommentTree(allComments || [])
+    const commentTree = buildCommentTree(comments || [])
 
     const baseUrl = await getBaseUrl()
     const shareUrl = `${baseUrl}/artikel/${article.slug}`
@@ -209,7 +213,7 @@ export default async function ArticlePage(
         <>
             <TrackView articleId={article.id} ipHash={ipHash} />
 
-            {/* JSON-LD Schema */}
+            {/* JSON-LD SEO */}
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
@@ -287,7 +291,7 @@ export default async function ArticlePage(
 
             <div className="max-w-3xl mx-auto mt-12 border-t pt-8">
                 <h2 className="text-2xl font-semibold mb-6">
-                    Komentar ({allComments?.length || 0})
+                    Komentar ({comments?.length || 0})
                 </h2>
 
                 <div className="space-y-6">
