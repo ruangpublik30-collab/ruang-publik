@@ -2,20 +2,21 @@ export const dynamic = "force-dynamic"
 
 import Image from "next/image"
 import { notFound } from "next/navigation"
+import { headers } from "next/headers"
+import type { Metadata } from "next"
+import crypto from "crypto"
+
 import { createClient } from "@/lib/supabase/server"
 import CommentItem from "@/components/CommentItem"
 import ShareDropdown from "@/components/ShareDropdown"
 import TrackView from "@/components/TrackView"
 import { Eye } from "lucide-react"
-import { headers } from "next/headers"
-import crypto from "crypto"
-import type { Metadata } from "next"
 
-/* ================= TYPES ================= */
+/* =========================
+   TYPES
+========================= */
 
-type Props = {
-    params: Promise<{ slug: string }>
-}
+type Params = Promise<{ slug: string }>
 
 type Comment = {
     id: string
@@ -26,7 +27,9 @@ type Comment = {
     replies?: Comment[]
 }
 
-/* ================= HELPERS ================= */
+/* =========================
+   HELPERS
+========================= */
 
 function stripHtml(html: string) {
     return html.replace(/<[^>]+>/g, "")
@@ -41,7 +44,9 @@ async function getBaseUrl() {
         "localhost:3000"
 
     const protocol =
-        process.env.NODE_ENV === "production" ? "https" : "http"
+        process.env.NODE_ENV === "production"
+            ? "https"
+            : "http"
 
     return `${protocol}://${host}`
 }
@@ -65,13 +70,16 @@ function buildCommentTree(comments: Comment[]): Comment[] {
     return roots
 }
 
-/* ================= METADATA ================= */
+/* =========================
+   METADATA (SEO)
+========================= */
 
 export async function generateMetadata(
-    { params }: Props
+    { params }: { params: Params }
 ): Promise<Metadata> {
 
     const { slug } = await params
+
     const supabase = await createClient()
 
     const { data } = await supabase
@@ -83,59 +91,71 @@ export async function generateMetadata(
 
     if (!data) {
         return {
-            title: "Artikel tidak ditemukan",
+            title: "Artikel tidak ditemukan | Ruang Publik",
             description: "Artikel tidak tersedia.",
+            robots: { index: false, follow: false },
         }
     }
 
     const baseUrl = await getBaseUrl()
     const url = `${baseUrl}/artikel/${data.slug}`
 
-    const description =
-        stripHtml(data.content || "").slice(0, 160)
+    const description = stripHtml(data.content || "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 160)
 
-    const imageUrl = data.thumbnail_url?.startsWith("http")
-        ? data.thumbnail_url
-        : `${baseUrl}${data.thumbnail_url}`
+    const imageUrl =
+        data.thumbnail_url?.startsWith("http")
+            ? data.thumbnail_url
+            : data.thumbnail_url
+                ? `${baseUrl}${data.thumbnail_url}`
+                : undefined
 
     return {
-        title: data.title,
+        title: `${data.title} | Ruang Publik`,
         description,
-        alternates: {
-            canonical: url,
-        },
+        alternates: { canonical: url },
+
         openGraph: {
             type: "article",
             url,
             title: data.title,
             description,
-            images: imageUrl
-                ? [
-                    {
-                        url: imageUrl,
-                        width: 1200,
-                        height: 630,
-                    },
-                ]
-                : [],
+            siteName: "Ruang Publik",
+            locale: "id_ID",
             publishedTime: data.published_at || undefined,
+            images: imageUrl
+                ? [{
+                    url: imageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: data.title,
+                }]
+                : [],
         },
+
         twitter: {
             card: "summary_large_image",
             title: data.title,
             description,
             images: imageUrl ? [imageUrl] : [],
         },
+
+        robots: { index: true, follow: true },
     }
 }
 
-/* ================= PAGE ================= */
+/* =========================
+   PAGE
+========================= */
 
 export default async function ArticlePage(
-    { params }: Props
+    { params }: { params: Params }
 ) {
 
     const { slug } = await params
+
     const supabase = await createClient()
 
     const { data: article, error } = await supabase
@@ -178,11 +198,45 @@ export default async function ArticlePage(
     const baseUrl = await getBaseUrl()
     const shareUrl = `${baseUrl}/artikel/${article.slug}`
 
+    const description = stripHtml(article.content || "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 160)
+
     /* ================= RENDER ================= */
 
     return (
         <>
             <TrackView articleId={article.id} ipHash={ipHash} />
+
+            {/* JSON-LD Schema */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Article",
+                        headline: article.title,
+                        description,
+                        image: article.thumbnail_url,
+                        datePublished: article.published_at,
+                        dateModified: article.published_at,
+                        mainEntityOfPage: shareUrl,
+                        author: {
+                            "@type": "Organization",
+                            name: "Ruang Publik",
+                        },
+                        publisher: {
+                            "@type": "Organization",
+                            name: "Ruang Publik",
+                            logo: {
+                                "@type": "ImageObject",
+                                url: `${baseUrl}/favicon.ico`,
+                            },
+                        },
+                    }),
+                }}
+            />
 
             <article className="max-w-3xl mx-auto">
                 <h1 className="text-4xl font-bold mb-2">
