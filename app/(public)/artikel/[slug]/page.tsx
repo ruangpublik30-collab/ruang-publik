@@ -10,6 +10,67 @@ import { headers } from "next/headers"
 import crypto from "crypto"
 import type { Metadata } from "next"
 
+
+
+type Props = {
+    params: { slug: string }
+}
+
+export async function generateMetadata(
+    { params }: Props
+): Promise<Metadata> {
+
+    const { slug } = await params   // ✅ WAJIB await
+
+    const supabase = await createClient()
+
+    const { data } = await supabase
+        .from("articles")
+        .select("title, content, thumbnail_url, slug, published_at")
+        .eq("slug", slug)           // ✅ pakai slug
+        .eq("status", "published")
+        .single()
+
+    if (!data) {
+        return {
+            title: "Artikel tidak ditemukan"
+        }
+    }
+
+    const description =
+        data.content?.replace(/<[^>]+>/g, "").slice(0, 160)
+
+    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/artikel/${data.slug}`
+
+    return {
+        title: data.title,
+        description,
+        alternates: {
+            canonical: url,
+        },
+        openGraph: {
+            type: "article",
+            url,
+            title: data.title,
+            description,
+            images: [
+                {
+                    url: data.thumbnail_url,
+                    width: 1200,
+                    height: 630,
+                },
+            ],
+            publishedTime: data.published_at,
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: data.title,
+            description,
+            images: [data.thumbnail_url],
+        },
+    }
+}
+
 type Comment = {
     id: string
     parent_id: string | null
@@ -19,68 +80,6 @@ type Comment = {
     replies?: Comment[]
 }
 
-/* ================= METADATA (UNTUK FACEBOOK & SEO) ================= */
-export async function generateMetadata(
-    { params }: { params: { slug: string } }
-): Promise<Metadata> {
-
-    const supabase = await createClient()
-
-    const { data: article } = await supabase
-        .from("articles")
-        .select("title, content, thumbnail_url, slug")
-        .eq("slug", params.slug)
-        .eq("status", "published")
-        .single()
-
-    if (!article) {
-        return {
-            title: "Artikel tidak ditemukan"
-        }
-    }
-
-    const plainText = article.content.replace(/<[^>]+>/g, "")
-    const description = plainText.slice(0, 160)
-
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!
-
-    return {
-        title: article.title,
-        description,
-        metadataBase: new URL(siteUrl),
-
-        alternates: {
-            canonical: `/artikel/${article.slug}`,
-        },
-
-        openGraph: {
-            title: article.title,
-            description,
-            url: `${siteUrl}/artikel/${article.slug}`,
-            type: "article",
-            images: article.thumbnail_url
-                ? [
-                    {
-                        url: article.thumbnail_url,
-                        width: 1200,
-                        height: 630,
-                    },
-                ]
-                : [],
-        },
-
-        twitter: {
-            card: "summary_large_image",
-            title: article.title,
-            description,
-            images: article.thumbnail_url
-                ? [article.thumbnail_url]
-                : [],
-        },
-    }
-}
-
-/* ================= HALAMAN ARTIKEL ================= */
 export default async function ArticlePage(
     { params }: { params: { slug: string } }
 ) {
@@ -99,7 +98,7 @@ export default async function ArticlePage(
     if (error || !article) notFound()
 
     /* ================= IP HASH (SERVER SIDE) ================= */
-    const headersList = await headers()
+    const headersList = await headers() // ✅ WAJIB await di Next terbaru
 
     const forwarded = headersList.get("x-forwarded-for")
     const realIp = headersList.get("x-real-ip")
