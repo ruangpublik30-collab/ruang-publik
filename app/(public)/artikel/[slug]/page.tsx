@@ -59,31 +59,23 @@ function buildCommentTree(comments: Comment[]): Comment[] {
    METADATA (DYNAMIC)
 ========================= */
 
-export const dynamic = "force-dynamic" // pastikan route selalu server-rendered
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata(
-    { params }: { params: Promise<Params> }
+    { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
+
     const { slug } = await params
+    const supabase = await createClient()
 
-    let data = null
+    const { data } = await supabase
+        .from("articles")
+        .select("title, content, thumbnail_url, slug, published_at")
+        .eq("slug", slug)
+        .eq("status", "published")
+        .single()
 
-    try {
-        const supabase = await createClient()
-        const res = await supabase
-            .from("articles")
-            .select("title, content, thumbnail_url, slug, published_at")
-            .eq("slug", slug)
-            .eq("status", "published")
-            .single()
-
-        if (res.data) data = res.data
-        else console.warn("Supabase returned null for slug:", slug)
-    } catch (err) {
-        console.error("Error fetching article metadata:", err)
-    }
-
-    const baseUrl = getBaseUrl()
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ruangpublik.fun"
     const url = `${baseUrl}/artikel/${slug}`
 
     if (!data) {
@@ -94,10 +86,12 @@ export async function generateMetadata(
         }
     }
 
-    const description = stripHtml(data.content || "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 160)
+    const description = data.content
+        ? data.content.replace(/<[^>]+>/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 160)
+        : ""
 
     const imageUrl = data.thumbnail_url
         ? data.thumbnail_url.startsWith("http")
@@ -106,10 +100,16 @@ export async function generateMetadata(
         : `${baseUrl}/default-og-image.jpg`
 
     return {
-        title: `${data.title} | Ruang Publik`,
-        description,
         metadataBase: new URL(baseUrl),
-        alternates: { canonical: url },
+
+        title: `${data.title} | Ruang Publik`,
+
+        description,
+
+        alternates: {
+            canonical: url,
+        },
+
         openGraph: {
             type: "article",
             url,
@@ -118,18 +118,29 @@ export async function generateMetadata(
             siteName: "Ruang Publik",
             locale: "id_ID",
             publishedTime: data.published_at ?? undefined,
-            images: [{ url: imageUrl, width: 1200, height: 630, alt: data.title }],
+            images: [
+                {
+                    url: imageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: data.title,
+                },
+            ],
         },
+
         twitter: {
             card: "summary_large_image",
             title: data.title,
             description,
             images: [imageUrl],
         },
-        robots: { index: true, follow: true },
+
+        robots: {
+            index: true,
+            follow: true,
+        },
     }
 }
-
 /* =========================
    PAGE COMPONENT
 ========================= */
