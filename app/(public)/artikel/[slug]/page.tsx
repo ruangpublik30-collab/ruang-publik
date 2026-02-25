@@ -58,14 +58,87 @@ function buildCommentTree(comments: Comment[]): Comment[] {
 /* =========================
    METADATA (DYNAMIC)
 ========================= */
-export async function generateMetadata({
-    params,
-}: {
-    params: { slug: string }
-}) {
+
+export const dynamic = "force-dynamic"
+
+export async function generateMetadata(
+    { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+
+    const { slug } = await params
+    const supabase = await createClient()
+
+    const { data } = await supabase
+        .from("articles")
+        .select("title, content, thumbnail_url, slug, published_at")
+        .eq("slug", slug)
+        .eq("status", "published")
+        .single()
+
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ruangpublik.fun"
+    const url = `${baseUrl}/artikel/${slug}`
+
+    if (!data) {
+        return {
+            title: "Artikel tidak ditemukan | Ruang Publik",
+            description: "Artikel tidak tersedia.",
+            robots: { index: false, follow: false },
+        }
+    }
+
+    const description = data.content
+        ? data.content.replace(/<[^>]+>/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 160)
+        : ""
+
+    const imageUrl = data.thumbnail_url
+        ? data.thumbnail_url.startsWith("http")
+            ? data.thumbnail_url
+            : `${baseUrl}${data.thumbnail_url}`
+        : `${baseUrl}/default-og-image.jpg`
+
     return {
-        title: "TEST META SLUG",
-        description: "TEST META SLUG DESC",
+        metadataBase: new URL(baseUrl),
+
+        title: `${data.title} | Ruang Publik`,
+
+        description,
+
+        alternates: {
+            canonical: url,
+        },
+
+        openGraph: {
+            type: "article",
+            url,
+            title: data.title,
+            description,
+            siteName: "Ruang Publik",
+            locale: "id_ID",
+            publishedTime: data.published_at ?? undefined,
+            images: [
+                {
+                    url: imageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: data.title,
+                },
+            ],
+        },
+
+        twitter: {
+            card: "summary_large_image",
+            title: data.title,
+            description,
+            images: [imageUrl],
+        },
+
+        robots: {
+            index: true,
+            follow: true,
+        },
     }
 }
 /* =========================
