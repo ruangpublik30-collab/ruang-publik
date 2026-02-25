@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic"
+
 
 import Image from "next/image"
 import { notFound } from "next/navigation"
@@ -44,7 +44,6 @@ function buildCommentTree(comments: Comment[]): Comment[] {
     const roots: Comment[] = []
 
     comments.forEach((c) => map.set(c.id, { ...c, replies: [] }))
-
     comments.forEach((c) => {
         if (c.parent_id) {
             map.get(c.parent_id)?.replies?.push(map.get(c.id)!)
@@ -57,23 +56,32 @@ function buildCommentTree(comments: Comment[]): Comment[] {
 }
 
 /* =========================
-   METADATA (FIXED)
+   METADATA (DYNAMIC)
 ========================= */
+
+export const dynamic = "force-dynamic" // pastikan route selalu server-rendered
 
 export async function generateMetadata(
     { params }: { params: Promise<Params> }
 ): Promise<Metadata> {
-
     const { slug } = await params
 
-    const supabase = await createClient()
+    let data = null
 
-    const { data } = await supabase
-        .from("articles")
-        .select("title, content, thumbnail_url, slug, published_at")
-        .eq("slug", slug)
-        .eq("status", "published")
-        .single()
+    try {
+        const supabase = await createClient()
+        const res = await supabase
+            .from("articles")
+            .select("title, content, thumbnail_url, slug, published_at")
+            .eq("slug", slug)
+            .eq("status", "published")
+            .single()
+
+        if (res.data) data = res.data
+        else console.warn("Supabase returned null for slug:", slug)
+    } catch (err) {
+        console.error("Error fetching article metadata:", err)
+    }
 
     const baseUrl = getBaseUrl()
     const url = `${baseUrl}/artikel/${slug}`
@@ -123,17 +131,16 @@ export async function generateMetadata(
 }
 
 /* =========================
-   PAGE (FIXED)
+   PAGE COMPONENT
 ========================= */
 
 export default async function ArticlePage(
     { params }: { params: Promise<Params> }
 ) {
-
     const { slug } = await params
-
     const supabase = await createClient()
 
+    // Ambil artikel
     const { data: article, error } = await supabase
         .from("articles")
         .select("id, slug, title, content, thumbnail_url, published_at, views")
@@ -143,15 +150,14 @@ export default async function ArticlePage(
 
     if (error || !article) notFound()
 
+    // Hitung IP hash untuk tracking view
     const headerList = await headers()
     const forwarded = headerList.get("x-forwarded-for")
     const realIp = headerList.get("x-real-ip")
-    const ip = forwarded
-        ? forwarded.split(",")[0].trim()
-        : realIp || "unknown"
-
+    const ip = forwarded ? forwarded.split(",")[0].trim() : realIp || "unknown"
     const ipHash = crypto.createHash("sha256").update(ip).digest("hex")
 
+    // Ambil komentar
     const { data: allComments } = await supabase
         .from("comments")
         .select("id, parent_id, name, content, created_at")
@@ -159,11 +165,9 @@ export default async function ArticlePage(
         .order("created_at", { ascending: true })
 
     const commentTree = buildCommentTree(allComments || [])
+
     const baseUrl = getBaseUrl()
     const shareUrl = `${baseUrl}/artikel/${article.slug}`
-    const description = stripHtml(article.content || "")
-        .replace(/\s+/g, " ")
-        .slice(0, 160)
 
     return (
         <>
@@ -222,9 +226,7 @@ export default async function ArticlePage(
                             />
                         ))
                     ) : (
-                        <p className="text-muted-foreground">
-                            Belum ada komentar.
-                        </p>
+                        <p className="text-muted-foreground">Belum ada komentar.</p>
                     )}
                 </div>
             </div>
