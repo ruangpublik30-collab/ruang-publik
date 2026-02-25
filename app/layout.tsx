@@ -8,6 +8,10 @@ const serif = Playfair_Display({
   variable: "--font-serif",
 })
 
+/* =========================
+   GLOBAL METADATA
+========================= */
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://ruangpublik.fun"),
 
@@ -30,6 +34,10 @@ export const metadata: Metadata = {
 
   authors: [{ name: "Ruang Publik" }],
 
+  alternates: {
+    canonical: "/",
+  },
+
   openGraph: {
     type: "website",
     siteName: "Ruang Publik",
@@ -38,6 +46,14 @@ export const metadata: Metadata = {
       "Portal opini dan analisis isu sosial, ekonomi, dan spiritual.",
     url: "https://ruangpublik.fun",
     locale: "id_ID",
+    images: [
+      {
+        url: "/og-image.jpg", // pastikan file ada di /public
+        width: 1200,
+        height: 630,
+        alt: "Ruang Publik",
+      },
+    ],
   },
 
   twitter: {
@@ -45,6 +61,7 @@ export const metadata: Metadata = {
     title: "Ruang Publik",
     description:
       "Portal opini dan analisis isu sosial, ekonomi, dan spiritual.",
+    images: ["/og-image.jpg"],
   },
 
   robots: {
@@ -56,6 +73,10 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
   },
 }
+
+/* =========================
+   ROOT LAYOUT
+========================= */
 
 export default function RootLayout({
   children,

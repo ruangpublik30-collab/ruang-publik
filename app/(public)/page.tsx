@@ -9,6 +9,8 @@ const baseUrl =
   "https://ruangpublik.fun"
 
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
+
   title: "Ruang Publik — Opini, Analisis & Tulisan",
   description:
     "Baca artikel opini, analisis mendalam, dan tulisan pribadi tentang berbagai topik menarik di Ruang Publik.",
@@ -18,11 +20,20 @@ export const metadata: Metadata = {
     description:
       "Baca artikel opini, analisis mendalam, dan tulisan pribadi tentang berbagai topik menarik di Ruang Publik.",
     type: "website",
-    url: "/",
+    url: baseUrl, // 🔥 WAJIB absolut
+    siteName: "Ruang Publik",
+    images: [
+      {
+        url: `${baseUrl}/og-default.jpg`,
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
 
   twitter: {
     card: "summary_large_image",
+    images: [`${baseUrl}/og-default.jpg`],
   },
 }
 
