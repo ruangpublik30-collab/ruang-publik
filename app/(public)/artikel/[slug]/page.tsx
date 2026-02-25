@@ -58,7 +58,11 @@ function buildCommentTree(comments: Comment[]): Comment[] {
 /* =========================
    METADATA (DYNAMIC)
 ========================= */
-export async function generateMetadata() {
+export async function generateMetadata({
+    params,
+}: {
+    params: { slug: string }
+}) {
     return {
         title: "TEST META SLUG",
         description: "TEST META SLUG DESC",
