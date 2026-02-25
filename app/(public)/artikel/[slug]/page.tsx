@@ -28,29 +28,23 @@ type Comment = {
 }
 
 /* =========================
-   HELPERS
+   HELPERS (PRODUCTION SAFE)
 ========================= */
 
 function stripHtml(html: string) {
     return html.replace(/<[^>]+>/g, "")
 }
 
-async function getBaseUrl() {
-    const headerList = await headers()
-
-    const host =
-        headerList.get("x-forwarded-host") ||
-        headerList.get("host") ||
-        "localhost:3000"
-
-    const protocol =
-        process.env.NODE_ENV === "production"
-            ? "https"
-            : "http"
-
-    return `${protocol}://${host}`
+/**
+ * Gunakan BASE URL dari environment variable.
+ * Jangan gunakan headers() untuk production URL.
+ */
+function getBaseUrl() {
+    return (
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        "https://ruangpublik.fun"
+    )
 }
-
 function buildCommentTree(comments: Comment[]): Comment[] {
     const map = new Map<string, Comment>()
     const roots: Comment[] = []

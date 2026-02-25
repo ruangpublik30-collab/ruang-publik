@@ -4,19 +4,25 @@ import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import ArticleCard from "@/components/ArticleCard"
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL!
+const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://ruangpublik.fun"
 
 export const metadata: Metadata = {
   title: "Ruang Publik — Opini, Analisis & Tulisan",
   description:
     "Baca artikel opini, analisis mendalam, dan tulisan pribadi tentang berbagai topik menarik di Ruang Publik.",
-  alternates: { canonical: baseUrl },
+
   openGraph: {
     title: "Ruang Publik — Opini, Analisis & Tulisan",
     description:
       "Baca artikel opini, analisis mendalam, dan tulisan pribadi tentang berbagai topik menarik di Ruang Publik.",
-    url: baseUrl,
     type: "website",
+    url: "/",
+  },
+
+  twitter: {
+    card: "summary_large_image",
   },
 }
 

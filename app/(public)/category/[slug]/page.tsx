@@ -23,11 +23,14 @@ type Category = {
 /* =========================
    ✅ SEO (SERVER SIDE)
 ========================= */
-export async function generateMetadata({
-    params,
-}: {
-    params: Promise<{ slug: string }>
-}): Promise<Metadata> {
+export async function generateMetadata(
+    {
+        params,
+    }: {
+        params: Promise<{ slug: string }>
+    }
+): Promise<Metadata> {
+
     const { slug } = await params
     const supabase = await createClient()
 
@@ -39,10 +42,15 @@ export async function generateMetadata({
 
     if (!category) return {}
 
-    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/category/${slug}`
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ruangpublik.fun"
+    const url = `${baseUrl}/category/${slug}`
 
     return {
-        title: `Kategori: ${category.name} | Ruang Publik`,
+        title: {
+            default: `Kategori: ${category.name}`,
+            template: "%s | Ruang Publik",
+        },
+
         description:
             category.description ??
             `Artikel dalam kategori ${category.name}.`,
@@ -52,12 +60,20 @@ export async function generateMetadata({
         },
 
         openGraph: {
+            type: "website",
+            siteName: "Ruang Publik",
             title: `Kategori: ${category.name}`,
             description:
                 category.description ??
                 `Artikel dalam kategori ${category.name}.`,
             url,
-            type: "website",
+            images: [
+                {
+                    url: "/og-default.jpg",
+                    width: 1200,
+                    height: 630,
+                },
+            ],
         },
 
         twitter: {
@@ -66,6 +82,7 @@ export async function generateMetadata({
             description:
                 category.description ??
                 `Artikel dalam kategori ${category.name}.`,
+            images: ["/og-default.jpg"],
         },
     }
 }
@@ -73,22 +90,25 @@ export async function generateMetadata({
 /* =========================
    ✅ PAGE SSR
 ========================= */
-export default async function CategoryPage({
-    params,
-}: {
-    params: Promise<{ slug: string }>
-}) {
+export default async function CategoryPage(
+    {
+        params,
+    }: {
+        params: Promise<{ slug: string }>
+    }
+) {
+
     const { slug } = await params
     const supabase = await createClient()
 
     /* 1️⃣ Ambil kategori */
-    const { data: category, error: categoryError } = await supabase
+    const { data: category, error } = await supabase
         .from("categories")
         .select("id, name, slug, description")
         .eq("slug", slug)
         .single()
 
-    if (categoryError || !category) {
+    if (error || !category) {
         notFound()
     }
 
@@ -111,7 +131,7 @@ export default async function CategoryPage({
                     Beranda
                 </Link>
                 <span className="mx-1">/</span>
-                <Link href="/categories" className="hover:text-primary">
+                <Link href="/category" className="hover:text-primary">
                     Kategori
                 </Link>
                 <span className="mx-1">/</span>
@@ -121,15 +141,25 @@ export default async function CategoryPage({
             </nav>
 
             {/* Title */}
-            <h1 className="font-heading text-4xl font-bold mb-8">
+            <h1 className="font-heading text-4xl font-bold mb-4">
                 {category.name}
             </h1>
+
+            {/* Description */}
+            {category.description && (
+                <p className="text-muted-foreground mb-8 max-w-2xl">
+                    {category.description}
+                </p>
+            )}
 
             {/* Articles */}
             {articles && articles.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {articles.map((article: Article) => (
-                        <ArticleCard key={article.id} article={article} />
+                        <ArticleCard
+                            key={article.id}
+                            article={article}
+                        />
                     ))}
                 </div>
             ) : (
@@ -139,4 +169,4 @@ export default async function CategoryPage({
             )}
         </div>
     )
-}
+}`  `
