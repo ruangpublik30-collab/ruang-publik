@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     locale: "id_ID",
     images: [
       {
-        url: "/og-image.jpg", // pastikan file ada di /public
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Ruang Publik",
@@ -71,6 +71,11 @@ export const metadata: Metadata = {
 
   icons: {
     icon: "/favicon.ico",
+  },
+
+  // ✅ INI YANG MENYELESAIKAN ERROR fb:app_id
+  other: {
+    "fb:app_id": "1234567890",
   },
 }
 
