@@ -20,110 +20,94 @@ export default function Navbar() {
     }
 
     return (
-        <header className="border-b relative">
-            <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+        <>
+            {/* FIXED NAVBAR */}
+            <header className="fixed inset-x-0 top-0 z-50 h-16 bg-background border-b">
+                <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
 
-                {/* Logo */}
-                <Link href="/" className="text-2xl font-serif font-semibold">
-                    Artikel
-                </Link>
+                    {/* Logo */}
+                    <Link href="/" className="text-2xl font-serif font-semibold">
+                        Artikel
+                    </Link>
 
-                {/* Desktop Menu */}
-                <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-                    <Link href="/">Beranda</Link>
-                    <Link href="/category">Kategori</Link>
-                    <Link href="/tag">Tag</Link>
-                </nav>
+                    {/* Desktop Menu */}
+                    <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
+                        <Link href="/">Beranda</Link>
+                        <Link href="/category">Kategori</Link>
+                        <Link href="/tag">Tag</Link>
+                    </nav>
 
-                {/* Right Side */}
-                <div className="flex items-center gap-4">
+                    {/* Right Side */}
+                    <div className="flex items-center gap-4">
 
-                    {/* Desktop Search */}
-                    <div className="hidden md:flex items-center">
-                        {!searchOpen ? (
-                            <button onClick={() => setSearchOpen(true)}>
-                                <Search className="w-5 h-5 text-muted-foreground hover:text-foreground" />
-                            </button>
-                        ) : (
-                            <form onSubmit={handleSearch} className="flex items-center gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Cari artikel..."
-                                    value={keyword}
-                                    onChange={(e) => setKeyword(e.target.value)}
-                                    className="border px-3 py-1 rounded-md text-sm w-48 focus:outline-none focus:ring-2 focus:ring-primary"
-                                    autoFocus
-                                />
-                                <button
-                                    type="submit"
-                                    className="text-sm px-3 py-1 bg-primary text-white rounded-md"
-                                >
-                                    Cari
+                        {/* Desktop Search */}
+                        <div className="hidden md:flex items-center">
+                            {!searchOpen ? (
+                                <button onClick={() => setSearchOpen(true)}>
+                                    <Search className="w-5 h-5 text-muted-foreground hover:text-foreground" />
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setSearchOpen(false)}
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            </form>
-                        )}
+                            ) : (
+                                <form onSubmit={handleSearch} className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Cari artikel..."
+                                        value={keyword}
+                                        onChange={(e) => setKeyword(e.target.value)}
+                                        className="border px-3 py-1 rounded-md text-sm w-48 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        autoFocus
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="text-sm px-3 py-1 bg-primary text-white rounded-md"
+                                    >
+                                        Cari
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchOpen(false)}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </form>
+                            )}
+                        </div>
+
+                        {/* Mobile Icons */}
+                        <button
+                            onClick={() => setSearchOpen(true)}
+                            className="md:hidden"
+                        >
+                            <Search className="w-5 h-5" />
+                        </button>
+
+                        <button
+                            onClick={() => setMobileOpen(!mobileOpen)}
+                            className="md:hidden"
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+
                     </div>
-
-                    {/* Mobile Search Icon */}
-                    <button
-                        onClick={() => setSearchOpen(true)}
-                        className="md:hidden"
-                    >
-                        <Search className="w-5 h-5" />
-                    </button>
-
-                    {/* Hamburger */}
-                    <button
-                        onClick={() => setMobileOpen(!mobileOpen)}
-                        className="md:hidden"
-                    >
-                        <Menu className="w-6 h-6" />
-                    </button>
                 </div>
-            </div>
 
-            {/* ✅ MOBILE SEARCH OVERLAY (tidak mendorong layout) */}
-            {searchOpen && (
-                <div className="absolute inset-0 bg-white flex items-center px-6 py-5 md:hidden z-50">
-                    <form onSubmit={handleSearch} className="flex items-center gap-2 w-full">
-                        <input
-                            type="text"
-                            placeholder="Cari artikel..."
-                            value={keyword}
-                            onChange={(e) => setKeyword(e.target.value)}
-                            className="flex-1 border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                            autoFocus
-                        />
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-primary text-white rounded-md"
-                        >
-                            Cari
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setSearchOpen(false)}
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                    </form>
-                </div>
-            )}
+                {mobileOpen && (
+                    <div className="md:hidden border-t px-6 py-4 flex flex-col gap-4 text-sm bg-background">
+                        <Link href="/" onClick={() => setMobileOpen(false)}>
+                            Beranda
+                        </Link>
+                        <Link href="/category" onClick={() => setMobileOpen(false)}>
+                            Kategori
+                        </Link>
+                        <Link href="/tag" onClick={() => setMobileOpen(false)}>
+                            Tag
+                        </Link>
+                    </div>
+                )}
+                
+            </header>
 
-            {/* Mobile Menu */}
-            {mobileOpen && (
-                <div className="md:hidden border-t px-6 py-4 flex flex-col gap-4 text-sm">
-                    <Link href="/">Beranda</Link>
-                    <Link href="/category">Kategori</Link>
-                    <Link href="/tag">Tag</Link>
-                </div>
-            )}
-        </header>
+            {/* Spacer supaya konten tidak ketutup */}
+            <div className="h-16" />
+        </>
     )
 }
