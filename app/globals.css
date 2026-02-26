@@ -178,3 +178,18 @@
     @apply bg-card px-1.5 py-0.5 rounded text-sm;
   }
 }
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-block;
+  min-width: 200%;
+  animation: marquee 17s linear infinite;
+}

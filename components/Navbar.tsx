@@ -31,11 +31,11 @@ export default function Navbar() {
                     </Link>
 
                     {/* Desktop Menu */}
-                    <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-                        <Link href="/">Beranda</Link>
-                        <Link href="/category">Kategori</Link>
-                        <Link href="/tag">Tag</Link>
-                        <Link href="/tentang">Tentang</Link>
+                    <nav className="hidden md:flex items-center gap-8 text-base font-semibold tracking-wide text-foreground">
+                        <Link href="/" className="hover:text-primary transition-colors">Beranda</Link>
+                        <Link href="/category" className="hover:text-primary transition-colors">Kategori</Link>
+                        <Link href="/tag" className="hover:text-primary transition-colors">Tag</Link>
+                        <Link href="/tentang" className="hover:text-primary transition-colors">Tentang</Link>
                     </nav>
 
                     {/* Right Side */}
@@ -92,21 +92,40 @@ export default function Navbar() {
                 </div>
 
                 {mobileOpen && (
-                    <div className="md:hidden border-t px-6 py-4 flex flex-col gap-4 text-sm bg-background">
-                        <Link href="/" onClick={() => setMobileOpen(false)}>
+                    <div className="md:hidden border-t px-6 py-5 flex flex-col gap-5 text-base font-medium bg-background">
+
+                        <Link
+                            href="/"
+                            onClick={() => setMobileOpen(false)}
+                            className="hover:text-primary transition-colors"
+                        >
                             Beranda
                         </Link>
-                        <Link href="/category" onClick={() => setMobileOpen(false)}>
+
+                        <Link
+                            href="/category"
+                            onClick={() => setMobileOpen(false)}
+                            className="hover:text-primary transition-colors"
+                        >
                             Kategori
                         </Link>
-                        <Link href="/tag" onClick={() => setMobileOpen(false)}>
+
+                        <Link
+                            href="/tag"
+                            onClick={() => setMobileOpen(false)}
+                            className="hover:text-primary transition-colors"
+                        >
                             Tag
                         </Link>
-                          
-                        <Link href="/tentang" onClick={() => setMobileOpen(false)}>
+
+                        <Link
+                            href="/tentang"
+                            onClick={() => setMobileOpen(false)}
+                            className="hover:text-primary transition-colors"
+                        >
                             Tentang
                         </Link>
-                          
+
                     </div>
                 )}
                 

@@ -2,6 +2,7 @@ import "./globals.css"
 import Navbar from "@/components/Navbar"
 import { Playfair_Display } from "next/font/google"
 import type { Metadata } from "next"
+import RunningText from "@/components/RunningText"
 
 const serif = Playfair_Display({
   subsets: ["latin"],
@@ -82,20 +83,44 @@ export const metadata: Metadata = {
 /* =========================
    ROOT LAYOUT
 ========================= */
+  export default function RootLayout({
+    children,
+  }: {
+    children: React.ReactNode
+  }) {
+    return (
+      <html lang="id" suppressHydrationWarning>
+        <body
+          className={`${serif.variable} min-h-screen bg-background text-foreground antialiased`}
+        >
+          <Navbar />
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="id" suppressHydrationWarning>
-      <body
-        className={`${serif.variable} min-h-screen bg-background text-foreground antialiased`}
-      >
-        <Navbar />
-        {children}
-      </body>
-    </html>
-  )
-}
+          {/* 🔴 Running Text */}
+          <RunningText />
+
+          {/* ✅ Organization Schema */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                name: "Ruang Publik",
+                url: "https://ruangpublik.fun",
+                logo: "https://ruangpublik.fun/logo.png",
+                sameAs: [
+                  "https://twitter.com/ruangpublik",
+                  "https://facebook.com/SidiqMuhammad"
+                ]
+              })
+            }}
+          />
+
+          {/* 🔴 Padding supaya tidak tertutup fixed */}
+          <div className="pt-28">
+            {children}
+          </div>
+        </body>
+      </html>
+    )
+  }
