@@ -67,7 +67,6 @@ export async function generateMetadata(
 
     const { slug } = await params
     const supabase = await createClient()
-
     const { data } = await supabase
         .from("articles")
         .select("title, content, thumbnail_url, slug, published_at")
@@ -80,7 +79,7 @@ export async function generateMetadata(
 
     if (!data) {
         return {
-            title: "Artikel tidak ditemukan | Ruang Publik",
+            title: "Artikel tidak ditemukan",
             description: "Artikel tidak tersedia.",
             robots: { index: false, follow: false },
         }
@@ -93,30 +92,23 @@ export async function generateMetadata(
             .slice(0, 160)
         : ""
 
-    const imageUrl = data.thumbnail_url
-        ? data.thumbnail_url.startsWith("http")
-            ? data.thumbnail_url
-            : `${baseUrl}${data.thumbnail_url}`
-        : `${baseUrl}/default-og-image.jpg`
+    const imageUrl = data.thumbnail_url?.startsWith("http")
+        ? data.thumbnail_url
+        : data.thumbnail_url
+            ? `${baseUrl}${data.thumbnail_url}`
+            : `${baseUrl}/default-og-image.jpg`
 
     return {
-        metadataBase: new URL(baseUrl),
-
-        title: `${data.title} | Ruang Publik`,
-
+        title: data.title,
         description,
-
         alternates: {
             canonical: url,
         },
-
         openGraph: {
             type: "article",
             url,
             title: data.title,
             description,
-            siteName: "Ruang Publik",
-            locale: "id_ID",
             publishedTime: data.published_at ?? undefined,
             images: [
                 {
@@ -127,14 +119,12 @@ export async function generateMetadata(
                 },
             ],
         },
-
         twitter: {
             card: "summary_large_image",
             title: data.title,
             description,
             images: [imageUrl],
         },
-
         robots: {
             index: true,
             follow: true,
