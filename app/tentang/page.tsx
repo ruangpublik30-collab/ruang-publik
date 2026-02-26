@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ruangpublik.fun"
 
 export const metadata: Metadata = {
-    title: "Tentang Kami - Ruang Publik | Media Opini & Analisis Indonesia",
+     title: "Tentang Kami",
     description:
         "Ruang Publik adalah media opini dan analisis yang membahas isu sosial, ekonomi, politik, religi, dan teknologi secara reflektif dan berbasis konteks.",
     alternates: {

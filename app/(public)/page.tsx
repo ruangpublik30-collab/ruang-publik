@@ -11,9 +11,9 @@ const baseUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
 
-  title: "Ruang Publik — Opini, Analisis & Tulisan",
+  title: "Opini, Analisis & Refleksi",
   description:
-    "Baca artikel opini, analisis mendalam, dan tulisan pribadi tentang berbagai topik menarik di Ruang Publik.",
+    "Baca artikel opini, analisis mendalam, dan tulisan tentang berbagai topik menarik di Ruang Publik.",
 
   openGraph: {
     title: "Ruang Publik — Opini, Analisis & Tulisan",
