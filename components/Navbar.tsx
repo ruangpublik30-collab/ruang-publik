@@ -102,8 +102,11 @@ export default function Navbar() {
                         <Link href="/tag" onClick={() => setMobileOpen(false)}>
                             Tag
                         </Link>
+                          
+                        <Link href="/tag" onClick={() => setMobileOpen(false)}>
                             Tentang
-                        <Link href="/tentang">Tentang</Link>
+                        </Link>
+                          
                     </div>
                 )}
                 
