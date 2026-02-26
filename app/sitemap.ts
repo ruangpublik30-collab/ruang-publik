@@ -9,7 +9,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .select("slug, published_at")
         .eq("status", "published")
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL!
+    const baseUrl =
+        process.env.NEXT_PUBLIC_SITE_URL || "https://ruangpublik.fun"
 
     const articles =
         data?.map((article) => ({
