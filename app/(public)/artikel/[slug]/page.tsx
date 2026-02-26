@@ -186,6 +186,7 @@ export default async function ArticlePage(
                             : `${baseUrl}${article.thumbnail_url}`,
                         datePublished: article.published_at,
                         dateModified: article.published_at,
+                        wordCount: stripHtml(article.content).split(/\s+/).length,
                         author: {
                             "@type": "Organization",
                             name: "Ruang Publik",
@@ -202,6 +203,29 @@ export default async function ArticlePage(
                             "@type": "WebPage",
                             "@id": shareUrl,
                         },
+                    }),
+                }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        itemListElement: [
+                            {
+                                "@type": "ListItem",
+                                position: 1,
+                                name: "Beranda",
+                                item: baseUrl,
+                            },
+                            {
+                                "@type": "ListItem",
+                                position: 2,
+                                name: article.title,
+                                item: shareUrl,
+                            },
+                        ],
                     }),
                 }}
             />

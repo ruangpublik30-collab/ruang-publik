@@ -69,7 +69,19 @@ export default async function HomePage() {
           }),
         }}
       />
-
+      {/* SEO Intro Text */}
+      <section className="mb-16">
+        <h1 className="sr-only">Ruang Publik — Opini, Analisis & Refleksi</h1>
+        <p className="text-muted-foreground leading-relaxed max-w-3xl">
+          Ruang Publik adalah media independen yang menyajikan artikel opini, analisis mendalam,
+          dan refleksi tentang isu sosial, budaya, keagamaan, dan dinamika masyarakat.
+          Setiap tulisan di Ruang Publik dirancang untuk menghadirkan sudut pandang kritis,
+          argumentasi yang jernih, serta bahasa yang mudah dipahami. Kami percaya bahwa
+          ruang diskusi yang sehat lahir dari tulisan yang bernas dan bertanggung jawab.
+          Melalui artikel yang terkurasi, Ruang Publik berupaya menjadi wadah pemikiran,
+          refleksi, dan pertukaran gagasan yang konstruktif bagi pembaca Indonesia.
+        </p>
+      </section>
       {/* ================= FEATURED ================= */}
       {featured && (
         <section className="mb-20">

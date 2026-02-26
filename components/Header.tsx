@@ -45,7 +45,7 @@ export default function Header({ onMenuChange }: HeaderProps) {
                             onClick={() => onMenuChange?.(null)}
                             className="text-xl sm:text-2xl font-bold tracking-tight hover:text-primary transition-colors"
                         >
-                            Artikel
+                            Ruang Publik
                         </Link>
 
                         {/* Desktop Navigation */}
