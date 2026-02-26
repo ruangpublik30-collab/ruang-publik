@@ -173,7 +173,38 @@ export default async function ArticlePage(
     return (
         <>
             <TrackView articleId={article.id} ipHash={ipHash} />
-
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Article",
+                        headline: article.title,
+                        description: stripHtml(article.content).slice(0, 160),
+                        image: article.thumbnail_url?.startsWith("http")
+                            ? article.thumbnail_url
+                            : `${baseUrl}${article.thumbnail_url}`,
+                        datePublished: article.published_at,
+                        dateModified: article.published_at,
+                        author: {
+                            "@type": "Organization",
+                            name: "Ruang Publik",
+                        },
+                        publisher: {
+                            "@type": "Organization",
+                            name: "Ruang Publik",
+                            logo: {
+                                "@type": "ImageObject",
+                                url: `${baseUrl}/logo.png`,
+                            },
+                        },
+                        mainEntityOfPage: {
+                            "@type": "WebPage",
+                            "@id": shareUrl,
+                        },
+                    }),
+                }}
+            />
             <article className="max-w-3xl mx-auto">
                 <h1 className="text-4xl font-bold mb-2">{article.title}</h1>
 
