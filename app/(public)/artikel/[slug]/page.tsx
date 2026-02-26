@@ -11,6 +11,7 @@ import CommentItem from "@/components/CommentItem"
 import ShareDropdown from "@/components/ShareDropdown"
 import TrackView from "@/components/TrackView"
 import { Eye } from "lucide-react"
+import Link from "next/link"
 
 /* =========================
    TYPES
@@ -144,7 +145,7 @@ export default async function ArticlePage(
     // Ambil artikel
     const { data: article, error } = await supabase
         .from("articles")
-        .select("id, slug, title, content, thumbnail_url, published_at, views")
+        .select("id, slug, title, content, thumbnail_url, published_at, views, category_id")
         .eq("slug", slug)
         .eq("status", "published")
         .single()
@@ -169,6 +170,15 @@ export default async function ArticlePage(
 
     const baseUrl = getBaseUrl()
     const shareUrl = `${baseUrl}/artikel/${article.slug}`
+    // Ambil artikel terkait (kategori sama)
+    const { data: relatedArticles } = await supabase
+        .from("articles")
+        .select("id, slug, title, thumbnail_url, published_at")
+        .eq("status", "published")
+        .eq("category_id", article.category_id)
+        .neq("id", article.id)
+        .order("published_at", { ascending: false })
+        .limit(3)
 
     return (
         <>
@@ -181,9 +191,11 @@ export default async function ArticlePage(
                         "@type": "Article",
                         headline: article.title,
                         description: stripHtml(article.content).slice(0, 160),
-                        image: article.thumbnail_url?.startsWith("http")
-                            ? article.thumbnail_url
-                            : `${baseUrl}${article.thumbnail_url}`,
+                        image: article.thumbnail_url
+                            ? article.thumbnail_url.startsWith("http")
+                                ? article.thumbnail_url
+                                : `${baseUrl}${article.thumbnail_url}`
+                            : `${baseUrl}/default-og-image.jpg`,
                         datePublished: article.published_at,
                         dateModified: article.published_at,
                         wordCount: stripHtml(article.content).split(/\s+/).length,
@@ -261,11 +273,13 @@ export default async function ArticlePage(
                     className="prose-article"
                     dangerouslySetInnerHTML={{ __html: article.content }}
                 />
+                <div className="mt-8 pt-6 border-t">
+                    <p className="text-sm font-medium mb-3">Bagikan artikel ini:</p>
+                    <div className="flex flex-wrap gap-3">
+                        <ShareDropdown title={article.title} url={shareUrl} />
+                    </div>
+                </div>
             </article>
-
-            <div className="max-w-3xl mx-auto mt-6 flex justify-end">
-                <ShareDropdown title={article.title} url={shareUrl} />
-            </div>
 
             <div className="max-w-3xl mx-auto mt-12 border-t pt-8">
                 <h2 className="text-2xl font-semibold mb-6">
@@ -286,6 +300,55 @@ export default async function ArticlePage(
                     )}
                 </div>
             </div>
+
+            {/* Artikel Terkait */}
+            <div className="max-w-3xl mx-auto mt-16 border-t pt-12">
+                <h2 className="text-2xl font-semibold mb-6">
+                    Artikel Terkait
+                </h2>
+
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {relatedArticles && relatedArticles.length > 0 ? (
+                        relatedArticles.map((item) => (
+                            <Link
+                                key={item.id}
+                                href={`/artikel/${item.slug}`}
+                                
+                                className="block border rounded-lg overflow-hidden hover:shadow-md transition"
+                                
+                            >
+                                {item.thumbnail_url && (
+                                    <Image
+                                        src={item.thumbnail_url}
+                                        alt={item.title}
+                                        width={400}
+                                        height={250}
+                                        className="w-full h-40 object-cover"
+                                    />
+                                )}
+
+                                <div className="p-4">
+                                    <h3 className="font-semibold text-sm line-clamp-2 mb-2">
+                                        {item.title}
+                                    </h3>
+
+                                    {item.published_at && (
+                                        <p className="text-xs text-muted-foreground">
+                                            {new Date(item.published_at).toLocaleDateString("id-ID")}
+                                        </p>
+                                    )}
+                                </div>
+                            </Link>
+                        ))
+                    ) : (
+                        <p className="text-muted-foreground">
+                            Belum ada artikel terkait.
+                        </p>
+                    )}
+                </div>
+            </div>
+
         </>
+        
     )
 }
