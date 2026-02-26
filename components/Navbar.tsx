@@ -35,6 +35,7 @@ export default function Navbar() {
                         <Link href="/">Beranda</Link>
                         <Link href="/category">Kategori</Link>
                         <Link href="/tag">Tag</Link>
+                        <Link href="/tentang">Tentang</Link>
                     </nav>
 
                     {/* Right Side */}
@@ -101,6 +102,8 @@ export default function Navbar() {
                         <Link href="/tag" onClick={() => setMobileOpen(false)}>
                             Tag
                         </Link>
+                            Tentang
+                        <Link href="/tentang">Tentang</Link>
                     </div>
                 )}
                 
