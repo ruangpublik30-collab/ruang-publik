@@ -117,7 +117,7 @@ export const metadata: Metadata = {
           />
 
           {/* 🔴 Padding supaya tidak tertutup fixed */}
-          <div className="pt-28">
+          <div className="pt-1000px">
             {children}
           </div>
         </body>
