@@ -96,7 +96,7 @@ export default function RootLayout({
         </div>
 
         {/* Spacer sesuai tinggi Navbar + RunningText */}
-        <div className="h-[50px]" />
+        <div className="h-[136px]" />
 
         {/* ================= MAIN CONTENT ================= */}
         <main className="flex-grow">

@@ -24,7 +24,7 @@ export default function Navbar() {
     return (
         <>
             {/* FIXED NAVBAR */}
-            <header className="fixed inset-x-0 top-0 z-50 h-16 bg-background border-b">
+            <header className="fixed inset-x-0 top-0 z-50 h-28 bg-background border-b">
                 <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
 
                         <div className="flex items-center h-full px-0">
