@@ -76,59 +76,65 @@ export default async function HomePage() {
             <Link
               key={cat.id}
               href={`/category/${cat.slug}`}
-              className="px-4 py-2 text-sm font-medium rounded-full bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
-              {cat.name}
-            </Link>
-          ))}
-        </nav>
-      )}
-      {/* SEO Intro Text */}
-      <section className="mb-16">
-        <h1 className="sr-only">Ruang Publik — Opini, Analisis & Refleksi</h1>
-        <p className="sr-only">
-          Ruang Publik adalah media independen yang menyajikan artikel opini, analisis mendalam,
-          dan refleksi tentang isu sosial, budaya, keagamaan, dan dinamika masyarakat.
-          Setiap tulisan di Ruang Publik dirancang untuk menghadirkan sudut pandang kritis,
-          argumentasi yang jernih, serta bahasa yang mudah dipahami. Kami percaya bahwa
-          ruang diskusi yang sehat lahir dari tulisan yang bernas dan bertanggung jawab.
-          Melalui artikel yang terkurasi, Ruang Publik berupaya menjadi wadah pemikiran,
-          refleksi, dan pertukaran gagasan yang konstruktif bagi pembaca Indonesia.
-        </p>
-      </section>
-      {/* ================= FEATURED ================= */}
-      {featured && (
-        <section className="mb-16 -mt-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden">
-              {featured.thumbnail_url && (
-                <Image
-                  src={featured.thumbnail_url}
-                  alt={featured.title}
-                  fill
-                  className="object-cover"
-                />
-              )}
-            </div>
-
-            <div className="space-y-6 border-l-4 border-primary pl-6">
-              <h2 className="text-4xl lg:text-5xl font-bold leading-tight">
-                {featured.title}
-              </h2>
-
-              {featured.published_at && (
-                <p className="text-sm text-muted-foreground">
-                  {new Date(
-                    featured.published_at
-                  ).toLocaleDateString("id-ID")}
+              className="
+              px-4 py-2 text-sm font-medium rounded-full 
+              bg-amber-50 text-amber-900
+              border border-amber-200
+              hover:bg-amber-500 hover:text-white hover:border-amber-500
+              transition-all duration-200
+"
+                >
+                  {cat.name}
+                </Link>
+                ))}
+                </nav>
+                )}
+                {/* SEO Intro Text */}
+               <section className="mb-16">
+                <h1 className="sr-only">Ruang Publik — Opini, Analisis & Refleksi</h1>
+                <p className="sr-only">
+                  Ruang Publik adalah media independen yang menyajikan artikel opini, analisis mendalam,
+                  dan refleksi tentang isu sosial, budaya, keagamaan, dan dinamika masyarakat.
+                  Setiap tulisan di Ruang Publik dirancang untuk menghadirkan sudut pandang kritis,
+                  argumentasi yang jernih, serta bahasa yang mudah dipahami. Kami percaya bahwa
+                  ruang diskusi yang sehat lahir dari tulisan yang bernas dan bertanggung jawab.
+                  Melalui artikel yang terkurasi, Ruang Publik berupaya menjadi wadah pemikiran,
+                  refleksi, dan pertukaran gagasan yang konstruktif bagi pembaca Indonesia.
                 </p>
-              )}
+              </section>
+              {/* ================= FEATURED ================= */}
+              {featured && (
+                <section className="mb-16 -mt-4">
+                  <div className="grid lg:grid-cols-2 gap-12 items-center">
+                    <div className="relative aspect-[16/10] rounded-2xl overflow-hidden">
+                      {featured.thumbnail_url && (
+                        <Image
+                          src={featured.thumbnail_url}
+                          alt={featured.title}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
 
-              {featured.excerpt && (
-                <p className="text-muted-foreground leading-relaxed text-lg">
-                  {featured.excerpt}
-                </p>
-              )}
+                    <div className="space-y-6 border-l-4 border-primary pl-6">
+                      <h2 className="text-4xl lg:text-5xl font-bold leading-tight">
+                        {featured.title}
+                      </h2>
+
+                      {featured.published_at && (
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(
+                            featured.published_at
+                          ).toLocaleDateString("id-ID")}
+                        </p>
+                      )}
+
+                      {featured.excerpt && (
+                        <p className="text-muted-foreground leading-relaxed text-lg">
+                          {featured.excerpt}
+                        </p>
+                      )}
 
               <Link
                 href={`/artikel/${featured.slug}`}
