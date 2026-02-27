@@ -151,7 +151,7 @@ export default function Header({ onMenuChange }: HeaderProps) {
             </header>
 
             {/* Spacer supaya konten tidak ketutup header */}
-            <div className="h-1000" />
+            <div className="h-16\" />
         </>
     )
 }

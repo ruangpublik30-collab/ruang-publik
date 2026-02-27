@@ -89,21 +89,24 @@ export default function RootLayout({
     <html lang="id" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
 
-        {/* 🔵 Navbar */}
-        <Navbar />
+        {/* ================= HEADER FIXED WRAPPER ================= */}
+        <div className="fixed top-0 left-0 w-full z-50">
+          <Navbar />
+          <RunningText />
+        </div>
 
-        {/* 🔵 Running Text */}
-        <RunningText />
+        {/* Spacer sesuai tinggi Navbar + RunningText */}
+        <div className="h-[50px]" />
 
-        {/* 🔵 Main Content */}
-        <main className="flex-grow pt-32">
+        {/* ================= MAIN CONTENT ================= */}
+        <main className="flex-grow">
           {children}
         </main>
 
-        {/* 🔵 Footer */}
+        {/* ================= FOOTER ================= */}
         <Footer />
 
-        {/* 🔵 Organization Schema */}
+        {/* ================= ORGANIZATION SCHEMA ================= */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -120,6 +123,7 @@ export default function RootLayout({
             }),
           }}
         />
+
       </body>
     </html>
   );

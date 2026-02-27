@@ -27,7 +27,7 @@ export default function Navbar() {
             <header className="fixed inset-x-0 top-0 z-50 h-16 bg-background border-b">
                 <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
 
-                        <div className="flex items-center h-full px-2">
+                        <div className="flex items-center h-full px-0">
 
                             <Link href="/" className="flex items-center">
                                 <Image
@@ -35,7 +35,7 @@ export default function Navbar() {
                                     alt="NDX"
                                     width={300}
                                     height={200}
-                                    className="h-20 w-auto"
+                                    className="h-26 w-auto"
                                     priority
                                 />
                             </Link>
