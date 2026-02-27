@@ -4,6 +4,8 @@ import Link from "next/link"
 import { Search, Menu, X } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image";
+
 
 export default function Navbar() {
     const [mobileOpen, setMobileOpen] = useState(false)
@@ -26,8 +28,15 @@ export default function Navbar() {
                 <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
 
                     {/* Logo */}
-                    <Link href="/" className="text-2xl font-serif font-semibold">
-                        Artikel
+                    <Link href="/" className="flex items-center">
+                        <Image
+                            src="/logo.png"   // pastikan sesuai nama file kamu
+                            alt="NDX"
+                            width={140}
+                            height={40}
+                            className="h-8 w-auto md:h-10"
+                            priority
+                        />
                     </Link>
 
                     {/* Desktop Menu */}
