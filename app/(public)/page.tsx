@@ -98,7 +98,7 @@ export default async function HomePage() {
       </section>
       {/* ================= FEATURED ================= */}
       {featured && (
-        <section className="mb-20">
+        <section className="mb-16 -mt-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative aspect-[16/10] rounded-2xl overflow-hidden">
               {featured.thumbnail_url && (
@@ -111,10 +111,10 @@ export default async function HomePage() {
               )}
             </div>
 
-            <div className="space-y-6">
-              <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+            <div className="space-y-6 border-l-4 border-primary pl-6">
+              <h2 className="text-4xl lg:text-5xl font-bold leading-tight">
                 {featured.title}
-              </h1>
+              </h2>
 
               {featured.published_at && (
                 <p className="text-sm text-muted-foreground">
