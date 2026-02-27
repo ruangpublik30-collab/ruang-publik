@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
+import Link from "next/link";
 
 export default function Footer() {
     const [showTop, setShowTop] = useState(false);
@@ -22,7 +23,6 @@ export default function Footer() {
         <>
             <footer className="relative mt-24 text-gray-300 bg-gradient-to-b from-black via-zinc-900 to-black">
 
-                {/* Garis emas */}
                 <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-yellow-500 to-transparent"></div>
 
                 <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10">
@@ -33,8 +33,8 @@ export default function Footer() {
                             NDX Insight
                         </h2>
                         <p className="text-sm leading-relaxed text-gray-400">
-                            Portal artikel opini, analisis sosial, ekonomi, dan refleksi
-                            spiritual yang membuka wawasan publik Indonesia.
+                            Media, market, dan development insight yang membangun
+                            perspektif rasional dan strategis.
                         </p>
                     </div>
 
@@ -42,16 +42,26 @@ export default function Footer() {
                     <div>
                         <h3 className="text-white font-semibold mb-4">Navigasi</h3>
                         <ul className="space-y-2 text-sm">
-                            {["Beranda", "Kategori", "Tag", "Tentang"].map((item) => (
-                                <li key={item}>
-                                    <a
-                                        href="#"
-                                        className="hover:text-yellow-400 transition duration-300"
-                                    >
-                                        {item}
-                                    </a>
-                                </li>
-                            ))}
+                            <li>
+                                <Link href="/" className="hover:text-yellow-400 transition duration-300">
+                                    Beranda
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/ruang-publik" className="hover:text-yellow-400 transition duration-300">
+                                    Ruang Publik
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/tentang" className="hover:text-yellow-400 transition duration-300">
+                                    Tentang
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/disclaimer" className="hover:text-yellow-400 transition duration-300">
+                                    Disclaimer
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 
@@ -96,14 +106,23 @@ export default function Footer() {
 
                 </div>
 
-                {/* Bottom */}
                 <div className="border-t border-zinc-800 text-center text-sm py-6 text-gray-500">
-                    © {new Date().getFullYear()} NDX Insight. All rights reserved.
+                    © {new Date().getFullYear()} NDX Insight.
+                    <div className="mt-2 flex justify-center gap-6">
+                        <Link href="/disclaimer" className="hover:text-yellow-400">
+                            Disclaimer
+                        </Link>
+                        <Link href="/privacy-policy" className="hover:text-yellow-400">
+                            Privacy Policy
+                        </Link>
+                        <Link href="/terms" className="hover:text-yellow-400">
+                            Terms
+                        </Link>
+                    </div>
                 </div>
 
             </footer>
 
-            {/* Back to Top */}
             {showTop && (
                 <button
                     onClick={scrollToTop}

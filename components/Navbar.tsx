@@ -49,6 +49,7 @@ export default function Navbar() {
                         <Link href="/category" className="hover:text-primary transition-colors">Kategori</Link>
                         <Link href="/tag" className="hover:text-primary transition-colors">Tag</Link>
                         <Link href="/tentang" className="hover:text-primary transition-colors">Tentang</Link>
+                        <Link href="/disclaimer" className="hover:text-primary transition-colors">Disclaimer</Link>
                     </nav>
 
                     {/* Right Side */}
@@ -169,6 +170,14 @@ export default function Navbar() {
                             className="hover:text-primary transition-colors"
                         >
                             Tentang
+                        </Link>
+
+                        <Link
+                            href="/disclaimer"
+                            onClick={() => setMobileOpen(false)}
+                            className="hover:text-primary transition-colors"
+                        >
+                            Dsclaimer
                         </Link>
 
                     </div>

@@ -4,6 +4,9 @@ import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import ArticleCard from "@/components/ArticleCard"
 
+
+
+
 const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
   "https://ruangpublik.fun"
@@ -90,16 +93,14 @@ export default async function HomePage() {
                 </nav>
                 )}
                 {/* SEO Intro Text */}
-               <section className="mb-16">
-                <h1 className="sr-only">Ruang Publik — Opini, Analisis & Refleksi</h1>
-                <p className="sr-only">
-                  Ruang Publik adalah media independen yang menyajikan artikel opini, analisis mendalam,
-                  dan refleksi tentang isu sosial, budaya, keagamaan, dan dinamika masyarakat.
-                  Setiap tulisan di Ruang Publik dirancang untuk menghadirkan sudut pandang kritis,
-                  argumentasi yang jernih, serta bahasa yang mudah dipahami. Kami percaya bahwa
-                  ruang diskusi yang sehat lahir dari tulisan yang bernas dan bertanggung jawab.
-                  Melalui artikel yang terkurasi, Ruang Publik berupaya menjadi wadah pemikiran,
-                  refleksi, dan pertukaran gagasan yang konstruktif bagi pembaca Indonesia.
+              <section className="mb-16 max-w-3xl">
+                <span className="text-sm font-semibold text-primary uppercase tracking-wide">
+                  Tentang Kami
+                </span>
+                <p className="mt-4 text-muted-foreground leading-relaxed text-lg">
+                  <strong>Ruang Publik</strong> adalah media independen yang menyajikan artikel opini,
+                  analisis mendalam, dan refleksi tentang isu sosial, budaya, keagamaan,
+                  serta dinamika masyarakat Indonesia.
                 </p>
               </section>
               {/* ================= FEATURED ================= */}
@@ -120,9 +121,9 @@ export default async function HomePage() {
                     </div>
 
                     <div className="space-y-6 border-l-4 border-primary pl-6">
-                      <h2 className="text-4xl lg:text-5xl font-bold leading-tight">
+                      <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
                         {featured.title}
-                      </h2>
+                      </h1>
 
                       {featured.published_at && (
                         <p className="text-sm text-muted-foreground">
