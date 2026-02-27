@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 const serif = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-serif",
+  display: "swap",
 })
 
 /* =========================
@@ -123,7 +124,7 @@ export default function RootLayout({
             }),
           }}
         />
-
+        
       </body>
     </html>
   );

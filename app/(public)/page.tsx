@@ -108,12 +108,14 @@ export default async function HomePage() {
                   <div className="grid lg:grid-cols-2 gap-12 items-center">
                     <div className="relative aspect-[16/10] rounded-2xl overflow-hidden">
                       {featured.thumbnail_url && (
-                        <Image
-                          src={featured.thumbnail_url}
-                          alt={featured.title}
-                          fill
-                          className="object-cover"
-                        />
+                <Image
+                  src={featured.thumbnail_url}
+                  alt={featured.title}
+                  fill
+                  priority
+                  className="object-cover"
+                />
+                        
                       )}
                     </div>
 
