@@ -27,7 +27,6 @@ export default function Navbar() {
             <header className="fixed inset-x-0 top-0 z-50 h-16 bg-background border-b">
                 <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
 
-                    <header className="h-24 border-b">
                         <div className="flex items-center h-full px-6">
 
                             <Link href="/" className="flex items-center">
@@ -42,7 +41,7 @@ export default function Navbar() {
                             </Link>
 
                         </div>
-                    </header>
+                    
 
                     {/* Desktop Menu */}
                     <nav className="hidden md:flex items-center gap-8 text-base font-semibold tracking-wide text-foreground">
