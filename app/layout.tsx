@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar"
 import { Playfair_Display } from "next/font/google"
 import type { Metadata } from "next"
 import RunningText from "@/components/RunningText"
+import Footer from "@/components/Footer";
 
 const serif = Playfair_Display({
   subsets: ["latin"],
@@ -79,48 +80,47 @@ export const metadata: Metadata = {
     "fb:app_id": "1234567890",
   },
 }
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="id" suppressHydrationWarning>
+      <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
 
-/* =========================
-   ROOT LAYOUT
-========================= */
-  export default function RootLayout({
-    children,
-  }: {
-    children: React.ReactNode
-  }) {
-    return (
-      <html lang="id" suppressHydrationWarning>
-        <body
-          className={`${serif.variable} min-h-screen bg-background text-foreground antialiased`}
-        >
-          <Navbar />
+        {/* 🔵 Navbar */}
+        <Navbar />
 
-          {/* 🔴 Running Text */}
-          <RunningText />
+        {/* 🔵 Running Text */}
+        <RunningText />
 
-          {/* ✅ Organization Schema */}
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                name: "Ruang Publik",
-                url: "https://ruangpublik.fun",
-                logo: "https://ruangpublik.fun/logo.png",
-                sameAs: [
-                  "https://twitter.com/ruangpublik",
-                  "https://facebook.com/SidiqMuhammad"
-                ]
-              })
-            }}
-          />
+        {/* 🔵 Main Content */}
+        <main className="flex-grow pt-32">
+          {children}
+        </main>
 
-          {/* 🔴 Padding supaya tidak tertutup fixed */}
-          <div className="pt-1000px">
-            {children}
-          </div>
-        </body>
-      </html>
-    )
-  }
+        {/* 🔵 Footer */}
+        <Footer />
+
+        {/* 🔵 Organization Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Ruang Publik",
+              url: "https://ruangpublik.fun",
+              logo: "https://ruangpublik.fun/logo.png",
+              sameAs: [
+                "https://twitter.com/ruangpublik",
+                "https://facebook.com/SidiqMuhammad"
+              ],
+            }),
+          }}
+        />
+      </body>
+    </html>
+  );
+}
