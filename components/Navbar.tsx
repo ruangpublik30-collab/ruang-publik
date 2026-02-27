@@ -32,8 +32,8 @@ export default function Navbar() {
                         <Image
                             src="/logo.png"   // pastikan sesuai nama file kamu
                             alt="NDX"
-                            width={140}
-                            height={40}
+                            width={300}
+                            height={200}
                             className="h-8 w-auto md:h-10"
                             priority
                         />
