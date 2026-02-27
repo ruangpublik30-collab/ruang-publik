@@ -69,6 +69,20 @@ export default async function HomePage() {
           }),
         }}
       />
+      {/* ================= CATEGORY FILTER ================= */}
+      {categories && categories.length > 0 && (
+        <nav className="flex flex-wrap gap-3 mb-14">
+          {categories.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/category/${cat.slug}`}
+              className="px-4 py-2 text-sm font-medium rounded-full bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              {cat.name}
+            </Link>
+          ))}
+        </nav>
+      )}
       {/* SEO Intro Text */}
       <section className="mb-16">
         <h1 className="sr-only">Ruang Publik — Opini, Analisis & Refleksi</h1>
@@ -127,20 +141,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ================= CATEGORY FILTER ================= */}
-      {categories && categories.length > 0 && (
-        <nav className="flex flex-wrap gap-3 mb-14">
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/category/${cat.slug}`}
-              className="px-4 py-2 text-sm font-medium rounded-full bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
-              {cat.name}
-            </Link>
-          ))}
-        </nav>
-      )}
+      
 
       {/* ================= ARTICLE GRID ================= */}
       {rest.length > 0 ? (
