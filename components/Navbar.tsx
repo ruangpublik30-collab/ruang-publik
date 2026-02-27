@@ -24,10 +24,10 @@ export default function Navbar() {
     return (
         <>
             {/* FIXED NAVBAR */}
-            <header className="fixed inset-x-0 top-0 z-50 h-28 bg-background border-b">
+            <header className="fixed inset-x-0 top-0 z-50 h-16 bg-background border-b">
                 <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
 
-                        <div className="flex items-center h-full px-0">
+                    <div className="flex items-center">
 
                             <Link href="/" className="flex items-center">
                                 <Image
@@ -35,7 +35,7 @@ export default function Navbar() {
                                     alt="NDX"
                                     width={300}
                                     height={200}
-                                    className="h-26 w-auto"
+                                    className="h-24 w-auto"
                                     priority
                                 />
                             </Link>
@@ -86,20 +86,52 @@ export default function Navbar() {
                             )}
                         </div>
 
-                        {/* Mobile Icons */}
+                        {/* Mobile Search Icon */}
                         <button
-                            onClick={() => setSearchOpen(true)}
+                            onClick={() => setSearchOpen(!searchOpen)}
                             className="md:hidden"
                         >
                             <Search className="w-5 h-5" />
                         </button>
 
+                        {/* Mobile Menu Icon */}
                         <button
                             onClick={() => setMobileOpen(!mobileOpen)}
                             className="md:hidden"
                         >
                             <Menu className="w-6 h-6" />
                         </button>
+
+                        {/* Mobile Search Dropdown */}
+                        {searchOpen && (
+                            <div className="md:hidden fixed top-16 left-0 w-full bg-background border-t px-6 py-4 z-[100] shadow-md">
+                                <form onSubmit={handleSearch} className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Cari artikel..."
+                                        value={keyword}
+                                        onChange={(e) => setKeyword(e.target.value)}
+                                        className="flex-1 border px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                        autoFocus
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="text-sm px-4 py-2 bg-primary text-white rounded-md"
+                                    >
+                                        Cari
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchOpen(false)}
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </form>
+                            </div>
+                        )}
+
+            
+                       
 
                     </div>
                 </div>
