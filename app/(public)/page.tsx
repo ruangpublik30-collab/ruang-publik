@@ -72,7 +72,7 @@ export default async function HomePage() {
       {/* SEO Intro Text */}
       <section className="mb-16">
         <h1 className="sr-only">Ruang Publik — Opini, Analisis & Refleksi</h1>
-        <p className="text-muted-foreground leading-relaxed max-w-3xl">
+        <p className="sr-only">
           Ruang Publik adalah media independen yang menyajikan artikel opini, analisis mendalam,
           dan refleksi tentang isu sosial, budaya, keagamaan, dan dinamika masyarakat.
           Setiap tulisan di Ruang Publik dirancang untuk menghadirkan sudut pandang kritis,
