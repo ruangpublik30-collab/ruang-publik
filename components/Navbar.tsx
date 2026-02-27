@@ -34,7 +34,7 @@ export default function Navbar() {
                             alt="NDX"
                             width={300}
                             height={200}
-                            className="h-8 w-auto md:h-10"
+                            className="h-14 w-auto"
                             priority
                         />
                     </Link>
